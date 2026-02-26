@@ -10,13 +10,24 @@ interface SessionListProps {
   sessions: Session[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export default function SessionList({
   sessions,
   selectedId,
   onSelect,
+  onDelete,
 }: SessionListProps) {
+  async function handleDelete(e: React.MouseEvent, id: string) {
+    e.stopPropagation();
+    if (!confirm("Delete this session? This cannot be undone.")) return;
+    const res = await fetch(`/api/sessions/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      onDelete?.(id);
+    }
+  }
+
   if (sessions.length === 0) {
     return (
       <Card className="text-center">
@@ -31,12 +42,32 @@ export default function SessionList({
         <button
           key={session.id}
           onClick={() => onSelect(session.id)}
-          className={`w-full text-left cursor-pointer rounded-xl border p-4 transition-colors ${
+          className={`group relative w-full text-left cursor-pointer rounded-xl border p-4 transition-colors ${
             selectedId === session.id
               ? "border-gold bg-gold-light/30"
               : "border-stone/30 bg-cream hover:border-gold/50"
           }`}
         >
+          {onDelete && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => handleDelete(e, session.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleDelete(
+                    e as unknown as React.MouseEvent,
+                    session.id
+                  );
+                }
+              }}
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-warm-gray hover:text-charcoal text-xs leading-none p-1 rounded"
+              title="Delete session"
+            >
+              &#x2715;
+            </span>
+          )}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="font-medium text-charcoal text-sm truncate">

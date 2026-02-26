@@ -88,6 +88,10 @@ export default function AdminPage() {
                 sessions={sessions}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
+                onDelete={(id) => {
+                  setSessions((prev) => prev.filter((s) => s.id !== id));
+                  if (selectedId === id) setSelectedId(null);
+                }}
               />
             </div>
             <div>

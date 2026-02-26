@@ -125,4 +125,18 @@ export function getMessages(sessionId: string): Message[] {
   return stmt.all(sessionId) as Message[];
 }
 
+export function deleteSession(id: string): void {
+  const db = getDb();
+  const deleteMessages = db.prepare(
+    "DELETE FROM messages WHERE session_id = ?"
+  );
+  const deleteSessionRow = db.prepare("DELETE FROM sessions WHERE id = ?");
+
+  const tx = db.transaction(() => {
+    deleteMessages.run(id);
+    deleteSessionRow.run(id);
+  });
+  tx();
+}
+
 export { getDb };
