@@ -47,11 +47,18 @@ export async function POST(req: Request) {
     }
   }
 
+  // Convert UIMessage format (parts array) to ModelMessage format (content string)
+  // Required because useChat sends UIMessages but streamText expects ModelMessages
+  const modelMessages = messages.map((msg: any) => ({
+    role: msg.role,
+    content: getMessageText(msg),
+  }));
+
   try {
     const result = streamText({
       model: anthropic("claude-sonnet-4-20250514"),
       system: INTERVIEW_SYSTEM_PROMPT,
-      messages,
+      messages: modelMessages,
       onFinish: async ({ text }) => {
         // Save assistant response to DB
         const assistantText = typeof text === "string" ? text : "";
