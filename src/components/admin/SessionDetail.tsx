@@ -28,12 +28,25 @@ export default function SessionDetail({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+    /* eslint-disable react-hooks/set-state-in-effect -- synchronous reset before async fetch */
+    setData(null);
     setLoading(true);
-    fetch(`/api/sessions/${sessionId}`)
+    /* eslint-enable react-hooks/set-state-in-effect */
+    fetch(`/api/sessions/${sessionId}`, { signal: controller.signal })
       .then((r) => r.json())
-      .then((d) => setData(d))
+      .then((d) => {
+        if (!cancelled) setData(d);
+      })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [sessionId]);
 
   if (loading) {

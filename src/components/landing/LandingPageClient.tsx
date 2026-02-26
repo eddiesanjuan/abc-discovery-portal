@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/landing/HeroSection";
@@ -8,17 +8,21 @@ import AboutSection from "@/components/landing/AboutSection";
 import WhatToExpect from "@/components/landing/WhatToExpect";
 import AccessGate from "@/components/landing/AccessGate";
 
+const emptySubscribe = () => () => {};
+
+function useIsClient(): boolean {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+}
+
 export default function LandingPageClient() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const isClient = useIsClient();
+  const [justAuthed, setJustAuthed] = useState(false);
 
-  useEffect(() => {
-    const auth = sessionStorage.getItem("visitorAuth");
-    setAuthenticated(auth === "true");
-    setChecking(false);
-  }, []);
-
-  if (checking) {
+  if (!isClient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ivory">
         <p className="text-warm-gray text-sm">Loading...</p>
@@ -26,8 +30,11 @@ export default function LandingPageClient() {
     );
   }
 
+  const storedAuth = sessionStorage.getItem("visitorAuth") === "true";
+  const authenticated = storedAuth || justAuthed;
+
   if (!authenticated) {
-    return <AccessGate onAuthenticated={() => setAuthenticated(true)} />;
+    return <AccessGate onAuthenticated={() => setJustAuthed(true)} />;
   }
 
   return (

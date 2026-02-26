@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useSyncExternalStore } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useRouter } from "next/navigation";
@@ -10,20 +10,29 @@ import ProgressBar from "@/components/interview/ProgressBar";
 import ChatContainer from "@/components/interview/ChatContainer";
 import InputBar from "@/components/interview/InputBar";
 
+const emptySubscribe = () => () => {};
+
+function useSessionId(): string | null {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => sessionStorage.getItem("sessionId"),
+    () => null
+  );
+}
+
 export default function InterviewPage() {
   const router = useRouter();
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const sessionId = useSessionId();
   const [completed, setCompleted] = useState(false);
   const [input, setInput] = useState("");
 
+  // Redirect if no session (client-only)
   useEffect(() => {
-    const id = sessionStorage.getItem("sessionId");
-    if (!id) {
+    if (sessionId === null) return; // SSR or not yet hydrated
+    if (!sessionId) {
       router.replace("/");
-      return;
     }
-    setSessionId(id);
-  }, [router]);
+  }, [sessionId, router]);
 
   const transport = useMemo(() => {
     if (!sessionId) return undefined;
@@ -74,6 +83,9 @@ export default function InterviewPage() {
 
   useEffect(() => {
     if (!isLoading && messages.length > 1) {
+      // checkCompletion is async and sets state only conditionally after
+      // an async gap (fetch), so the synchronous setState concern doesn't apply.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       checkCompletion();
     }
   }, [isLoading, messages, checkCompletion]);

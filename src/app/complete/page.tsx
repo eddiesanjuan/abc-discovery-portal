@@ -31,15 +31,24 @@ function CompleteContent() {
     const id =
       searchParams.get("session") || sessionStorage.getItem("sessionId");
     if (!id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
 
+    let cancelled = false;
     fetch(`/api/sessions/${id}`)
       .then((r) => r.json())
-      .then((data) => setSession(data))
+      .then((data) => {
+        if (!cancelled) setSession(data);
+      })
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [searchParams]);
 
   if (loading) {
