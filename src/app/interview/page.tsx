@@ -90,9 +90,10 @@ export default function InterviewPage() {
     }
   }, [isLoading, messages, checkCompletion]);
 
-  // Estimate phase from message count
-  const pairCount = Math.floor(messages.length / 2);
-  const phase = Math.min(pairCount, PHASE_LABELS.length - 1);
+  // Estimate phase from completed exchanges (assistant messages only)
+  const assistantMessageCount = messages.filter((m) => m.role === "assistant").length;
+  // Subtract 1 because the initial greeting is not a response to user input
+  const phase = Math.min(Math.max(assistantMessageCount - 1, 0), PHASE_LABELS.length - 1);
 
   async function handleSend() {
     if (!input.trim() || isLoading) return;

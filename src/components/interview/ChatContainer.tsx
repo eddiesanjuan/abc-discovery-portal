@@ -53,6 +53,13 @@ export default function ChatContainer({
             />
           );
         })}
+        {status === "error" && (
+          <div className="flex justify-start mb-4">
+            <div className="max-w-[85%] md:max-w-[75%] px-5 py-3 rounded-2xl rounded-bl-md bg-terracotta/10 text-terracotta text-sm">
+              Something went wrong. Please try sending your message again.
+            </div>
+          </div>
+        )}
         {status === "submitted" && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
