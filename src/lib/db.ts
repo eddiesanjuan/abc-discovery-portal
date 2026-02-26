@@ -1,50 +1,54 @@
 import Database from "better-sqlite3";
-import { existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { mkdirSync } from "fs";
+import { join, dirname } from "path";
 import { v4 as uuidv4 } from "uuid";
 import type { Session, Message } from "./types";
 
-const DATA_DIR = join(process.cwd(), "data");
-const DB_PATH = join(DATA_DIR, "interviews.db");
+const DB_PATH = join(process.cwd(), "data", "interviews.db");
 
-if (!existsSync(DATA_DIR)) {
-  mkdirSync(DATA_DIR, { recursive: true });
+let _db: Database.Database | null = null;
+
+function getDb(): Database.Database {
+  if (!_db) {
+    mkdirSync(dirname(DB_PATH), { recursive: true });
+    _db = new Database(DB_PATH);
+    _db.pragma("journal_mode = WAL");
+
+    _db.exec(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        participant_name TEXT,
+        participant_role TEXT,
+        participant_company TEXT DEFAULT 'ABC',
+        status TEXT DEFAULT 'in_progress',
+        started_at TEXT NOT NULL,
+        completed_at TEXT,
+        summary TEXT,
+        key_pain_points TEXT,
+        ai_interests TEXT,
+        questions_for_eddie TEXT,
+        vision_notes TEXT,
+        metadata TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS messages (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        phase INTEGER,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (session_id) REFERENCES sessions(id)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, created_at);
+    `);
+  }
+  return _db;
 }
 
-const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS sessions (
-    id TEXT PRIMARY KEY,
-    participant_name TEXT,
-    participant_role TEXT,
-    participant_company TEXT DEFAULT 'ABC',
-    status TEXT DEFAULT 'in_progress',
-    started_at TEXT NOT NULL,
-    completed_at TEXT,
-    summary TEXT,
-    key_pain_points TEXT,
-    ai_interests TEXT,
-    questions_for_eddie TEXT,
-    vision_notes TEXT,
-    metadata TEXT
-  );
-
-  CREATE TABLE IF NOT EXISTS messages (
-    id TEXT PRIMARY KEY,
-    session_id TEXT NOT NULL,
-    role TEXT NOT NULL,
-    content TEXT NOT NULL,
-    phase INTEGER,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY (session_id) REFERENCES sessions(id)
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, created_at);
-`);
-
 export function createSession(id: string): Session {
+  const db = getDb();
   const now = new Date().toISOString();
   const stmt = db.prepare(`
     INSERT INTO sessions (id, participant_company, status, started_at)
@@ -55,11 +59,13 @@ export function createSession(id: string): Session {
 }
 
 export function getSession(id: string): Session | null {
+  const db = getDb();
   const stmt = db.prepare("SELECT * FROM sessions WHERE id = ?");
   return (stmt.get(id) as Session) || null;
 }
 
 export function listSessions(): Session[] {
+  const db = getDb();
   const stmt = db.prepare(
     "SELECT * FROM sessions ORDER BY started_at DESC"
   );
@@ -70,6 +76,7 @@ export function updateSession(
   id: string,
   fields: Partial<Session>
 ): void {
+  const db = getDb();
   const allowed = [
     "participant_name",
     "participant_role",
@@ -100,6 +107,7 @@ export function addMessage(
   content: string,
   phase?: number
 ): void {
+  const db = getDb();
   const id = uuidv4();
   const now = new Date().toISOString();
   const stmt = db.prepare(`
@@ -110,10 +118,11 @@ export function addMessage(
 }
 
 export function getMessages(sessionId: string): Message[] {
+  const db = getDb();
   const stmt = db.prepare(
     "SELECT * FROM messages WHERE session_id = ? ORDER BY created_at ASC"
   );
   return stmt.all(sessionId) as Message[];
 }
 
-export default db;
+export { getDb };

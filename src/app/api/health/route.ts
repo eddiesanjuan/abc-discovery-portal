@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 export async function GET() {
   const checks: Record<string, string> = {};
@@ -9,6 +9,7 @@ export async function GET() {
 
   // Check DB
   try {
+    const db = getDb();
     const row = db.prepare("SELECT 1 AS ok").get() as { ok: number };
     checks.database = row?.ok === 1 ? "ok" : "error";
   } catch {
