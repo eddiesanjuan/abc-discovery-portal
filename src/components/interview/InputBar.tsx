@@ -36,7 +36,7 @@ export default function InputBar({
   }
 
   return (
-    <div className="border-t border-stone/30 bg-ivory/90 backdrop-blur-sm">
+    <div className="border-t border-stone/30 bg-ivory/90 backdrop-blur-sm pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-2xl mx-auto flex items-end gap-3 px-4 md:px-6 py-4">
         <textarea
           ref={textareaRef}
@@ -44,6 +44,7 @@ export default function InputBar({
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Share your thoughts..."
+          aria-label="Your response"
           disabled={isLoading}
           rows={1}
           className="flex-1 resize-none rounded-xl border border-stone/50 bg-white px-4 py-3 text-[15px] text-charcoal placeholder:text-warm-gray/60 focus:outline-none focus:border-gold transition-colors disabled:opacity-50"

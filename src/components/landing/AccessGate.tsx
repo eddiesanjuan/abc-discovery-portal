@@ -71,6 +71,7 @@ export default function AccessGate({ onAuthenticated }: AccessGateProps) {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="Access code"
+            aria-label="Access code"
             autoFocus
             className="w-full rounded-lg border border-stone/50 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-warm-gray/60 focus:outline-none focus:border-gold transition-colors text-center tracking-widest"
           />

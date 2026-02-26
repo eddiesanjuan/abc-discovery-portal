@@ -49,6 +49,7 @@ export default function PasswordGate({ onAuthenticated }: PasswordGateProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
+            aria-label="Admin password"
             className="w-full rounded-lg border border-stone/50 bg-white px-4 py-3 text-sm text-charcoal placeholder:text-warm-gray/60 focus:outline-none focus:border-gold transition-colors"
           />
           {error && (

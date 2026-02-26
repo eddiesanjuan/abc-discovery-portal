@@ -11,6 +11,9 @@ export default function HeroSection() {
 
       <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
         <FadeIn>
+          <div className="flex justify-center mb-8">
+            <div className="w-16 h-px bg-gold" />
+          </div>
           <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl leading-tight text-charcoal">
             Before We Meet, Let&apos;s Discover What Matters Most to You
           </h1>

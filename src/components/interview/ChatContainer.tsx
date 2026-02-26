@@ -7,7 +7,7 @@ import type { UIMessage } from "ai";
 
 interface ChatContainerProps {
   messages: UIMessage[];
-  isLoading: boolean;
+  status: "submitted" | "streaming" | "ready" | "error";
 }
 
 function getMessageText(msg: UIMessage): string {
@@ -17,15 +17,25 @@ function getMessageText(msg: UIMessage): string {
     .join("");
 }
 
+function cleanAssistantText(text: string): string {
+  // Remove complete marker
+  let cleaned = text.replace("[INTERVIEW_COMPLETE]", "").trim();
+  // During streaming, hide partial marker artifacts
+  if (cleaned.includes("[INTERVIEW")) {
+    cleaned = cleaned.replace(/\[INTERVIEW.*$/, "").trim();
+  }
+  return cleaned;
+}
+
 export default function ChatContainer({
   messages,
-  isLoading,
+  status,
 }: ChatContainerProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, [messages, status]);
 
   return (
     <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
@@ -38,14 +48,12 @@ export default function ChatContainer({
               key={msg.id}
               role={msg.role as "user" | "assistant"}
               content={
-                msg.role === "assistant"
-                  ? text.replace("[INTERVIEW_COMPLETE]", "").trim()
-                  : text
+                msg.role === "assistant" ? cleanAssistantText(text) : text
               }
             />
           );
         })}
-        {isLoading && <TypingIndicator />}
+        {status === "submitted" && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
     </div>

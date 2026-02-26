@@ -117,7 +117,7 @@ export default function InterviewPage() {
           <InterviewHeader phase={phase} />
         </div>
       </div>
-      <ChatContainer messages={messages} isLoading={isLoading} />
+      <ChatContainer messages={messages} status={status} />
       <InputBar
         input={input}
         isLoading={isLoading}

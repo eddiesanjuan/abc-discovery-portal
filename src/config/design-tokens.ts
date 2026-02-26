@@ -2,7 +2,7 @@ export const colors = {
   ivory: "#FAFAF7",
   cream: "#F5F0EB",
   stone: "#E8E0D8",
-  warmGray: "#9C9589",
+  warmGray: "#7A756D",
   charcoal: "#2C2C2C",
   gold: "#C5A572",
   goldHover: "#B8965F",
