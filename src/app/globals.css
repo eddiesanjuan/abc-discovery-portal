@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ivory: #FAFAF7;
+  --color-cream: #F5F0EB;
+  --color-stone: #E8E0D8;
+  --color-warm-gray: #9C9589;
+  --color-charcoal: #2C2C2C;
+  --color-gold: #C5A572;
+  --color-gold-hover: #B8965F;
+  --color-gold-light: #F4EDE1;
+  --color-navy: #1B2838;
+  --color-sage: #7A8B6F;
+  --color-terracotta: #C17B5E;
+  --color-assistant-bg: #F5F0EB;
+  --color-user-bg: #2C2C2C;
+  --color-user-text: #FAFAF7;
+
+  --font-playfair: "Playfair Display", serif;
+  --font-inter: "Inter", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::selection {
+  background-color: var(--color-gold-light);
+  color: var(--color-charcoal);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-stone) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-stone);
+  border-radius: 3px;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ivory);
+  color: var(--color-charcoal);
+  font-family: var(--font-inter);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dot-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-dot-1 {
+  animation: dot-bounce 1.4s infinite;
+  animation-delay: 0s;
+}
+
+.animate-dot-2 {
+  animation: dot-bounce 1.4s infinite;
+  animation-delay: 0.2s;
+}
+
+.animate-dot-3 {
+  animation: dot-bounce 1.4s infinite;
+  animation-delay: 0.4s;
 }

@@ -1,0 +1,16 @@
+export const colors = {
+  ivory: "#FAFAF7",
+  cream: "#F5F0EB",
+  stone: "#E8E0D8",
+  warmGray: "#9C9589",
+  charcoal: "#2C2C2C",
+  gold: "#C5A572",
+  goldHover: "#B8965F",
+  goldLight: "#F4EDE1",
+  navy: "#1B2838",
+  sage: "#7A8B6F",
+  terracotta: "#C17B5E",
+  assistantBg: "#F5F0EB",
+  userBg: "#2C2C2C",
+  userText: "#FAFAF7",
+};
