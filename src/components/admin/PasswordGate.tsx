@@ -26,6 +26,7 @@ export default function PasswordGate({ onAuthenticated }: PasswordGateProps) {
       });
       if (res.ok) {
         sessionStorage.setItem("adminAuth", "true");
+        sessionStorage.setItem("adminPassword", password);
         onAuthenticated();
       } else {
         setError("Invalid password");

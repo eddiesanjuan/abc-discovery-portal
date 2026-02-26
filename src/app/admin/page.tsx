@@ -6,6 +6,7 @@ import PasswordGate from "@/components/admin/PasswordGate";
 import SessionList from "@/components/admin/SessionList";
 import SessionDetail from "@/components/admin/SessionDetail";
 import Spinner from "@/components/ui/Spinner";
+import Button from "@/components/ui/Button";
 import type { Session } from "@/lib/types";
 
 const emptySubscribe = () => () => {};
@@ -58,9 +59,23 @@ export default function AdminPage() {
     <div className="min-h-screen bg-ivory">
       <Header />
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="font-playfair text-3xl text-charcoal mb-8">
-          Interview Sessions
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="font-playfair text-3xl text-charcoal">
+            Interview Sessions
+          </h1>
+          <Button
+            onClick={() => {
+              const pw = sessionStorage.getItem("adminPassword") ?? "";
+              const url = `/api/admin/export?password=${encodeURIComponent(pw)}`;
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `sessions-${new Date().toISOString().slice(0, 10)}.json`;
+              a.click();
+            }}
+          >
+            Export JSON
+          </Button>
+        </div>
 
         {loading ? (
           <div className="flex justify-center py-12">
