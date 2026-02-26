@@ -44,6 +44,13 @@ export default function WhatToExpect() {
             </FadeIn>
           ))}
         </div>
+        <div className="mt-12 text-center">
+          <p className="text-warm-gray text-sm leading-relaxed max-w-lg mx-auto">
+            Your responses are private — shared only with Eddie San Juan to
+            prepare a conversation tailored to your interests. Nothing leaves
+            this page.
+          </p>
+        </div>
       </div>
     </section>
   );
