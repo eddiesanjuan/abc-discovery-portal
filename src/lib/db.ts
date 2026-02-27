@@ -4,7 +4,12 @@ import { join, dirname } from "path";
 import { v4 as uuidv4 } from "uuid";
 import type { Session, Message } from "./types";
 
-const DB_PATH = join(process.cwd(), "data", "interviews.db");
+const isProduction =
+  !!process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === "production";
+
+const DB_PATH = isProduction
+  ? "/data/interviews.db"
+  : join(process.cwd(), "data", "interviews.db");
 
 let _db: Database.Database | null = null;
 
