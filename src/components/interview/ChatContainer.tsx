@@ -28,7 +28,21 @@ function cleanAssistantText(text: string): string {
   if (cleaned.includes("[INTERVIEW")) {
     cleaned = cleaned.replace(/\[INTERVIEW.*$/, "").trim();
   }
+  // Remove suggestion markers (e.g. [SUGGESTIONS: "A" | "B" | "C"])
+  cleaned = cleaned.replace(/\[SUGGESTIONS:.*?\]/g, "").trim();
+  // During streaming, hide partial suggestion marker artifacts
+  cleaned = cleaned.replace(/\[SUGGESTIONS(?::.*)?$/g, "").trim();
   return cleaned;
+}
+
+/** Extract suggestion options from [SUGGESTIONS: "A" | "B" | "C"] marker */
+export function parseSuggestions(text: string): string[] {
+  const match = text.match(/\[SUGGESTIONS:\s*(.*?)\]/);
+  if (!match) return [];
+  return match[1]
+    .split("|")
+    .map((s) => s.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
 }
 
 export default function ChatContainer({

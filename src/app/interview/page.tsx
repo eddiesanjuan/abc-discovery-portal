@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { INITIAL_MESSAGE, PHASE_LABELS } from "@/lib/prompts";
 import ProgressBar from "@/components/interview/ProgressBar";
 import ChatContainer from "@/components/interview/ChatContainer";
+import { parseSuggestions } from "@/components/interview/ChatContainer";
+import SuggestionChips from "@/components/interview/SuggestionChips";
 import InputBar from "@/components/interview/InputBar";
 import CompletionTransition from "@/components/interview/CompletionTransition";
 
@@ -107,11 +109,12 @@ export default function InterviewPage() {
 
   // Determine phase from the AI's [PHASE:N] marker in the most recent assistant message.
   // Phase 7 (farewell) maps to phase index 5 (6/6 on the progress bar).
+  // Returns -1 when no phase marker found (initial disclaimer message).
   const phase = useMemo(() => {
     const lastAssistant = [...messages]
       .reverse()
       .find((m) => m.role === "assistant");
-    if (!lastAssistant) return 0;
+    if (!lastAssistant) return -1;
     const text = lastAssistant.parts
       .filter((p): p is { type: "text"; text: string } => p.type === "text")
       .map((p) => p.text)
@@ -122,13 +125,35 @@ export default function InterviewPage() {
       // Phase 7 (farewell) stays at 6/6 → index 5
       return Math.min(Math.max(n - 1, 0), PHASE_LABELS.length - 1);
     }
-    return 0;
+    return -1;
   }, [messages]);
+
+  // Extract suggestions from the latest assistant message (only when not streaming)
+  const suggestions = useMemo(() => {
+    if (isLoading) return [];
+    const lastAssistant = [...messages]
+      .reverse()
+      .find((m) => m.role === "assistant");
+    if (!lastAssistant) return [];
+    const text = lastAssistant.parts
+      .filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("");
+    return parseSuggestions(text);
+  }, [messages, isLoading]);
+
+  // Chips are visible when suggestions exist and user hasn't started typing
+  const showChips = suggestions.length > 0 && !input.trim() && !completed;
 
   async function handleSend() {
     if (!input.trim() || isLoading) return;
     const text = input;
     setInput("");
+    await sendMessage({ text });
+  }
+
+  async function handleChipSelect(text: string) {
+    if (isLoading) return;
     await sendMessage({ text });
   }
 
@@ -145,12 +170,19 @@ export default function InterviewPage() {
       <ProgressBar currentPhase={phase} />
       <ChatContainer messages={messages} status={status} />
       {!completed && (
-        <InputBar
-          input={input}
-          isLoading={isLoading}
-          onInputChange={setInput}
-          onSend={handleSend}
-        />
+        <>
+          <SuggestionChips
+            suggestions={suggestions}
+            onSelect={handleChipSelect}
+            visible={showChips}
+          />
+          <InputBar
+            input={input}
+            isLoading={isLoading}
+            onInputChange={setInput}
+            onSend={handleSend}
+          />
+        </>
       )}
       {transitioning && <CompletionTransition />}
     </div>

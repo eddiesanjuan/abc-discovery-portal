@@ -9,8 +9,14 @@ interface ProgressBarProps {
 export default function ProgressBar({
   currentPhase,
 }: ProgressBarProps) {
-  const phase = Math.min(currentPhase, PHASE_LABELS.length - 1);
-  const progress = ((phase + 1) / PHASE_LABELS.length) * 100;
+  // Phase -1 means no phase marker yet (initial disclaimer message)
+  const hasStarted = currentPhase >= 0;
+  const phase = hasStarted
+    ? Math.min(currentPhase, PHASE_LABELS.length - 1)
+    : 0;
+  const progress = hasStarted
+    ? ((phase + 1) / PHASE_LABELS.length) * 100
+    : 0;
 
   return (
     <div className="w-full">
@@ -24,11 +30,15 @@ export default function ProgressBar({
       {/* Phase label and step count */}
       <div className="flex items-center justify-between px-4 md:px-6 py-2 max-w-2xl mx-auto">
         <p className="text-xs text-warm-gray tracking-wide">
-          {PHASE_LABELS[phase]}
+          {hasStarted
+            ? PHASE_LABELS[phase]
+            : `${PHASE_LABELS.length} topics to cover`}
         </p>
-        <p className="text-xs text-warm-gray/60 tabular-nums">
-          {phase + 1} of {PHASE_LABELS.length}
-        </p>
+        {hasStarted && (
+          <p className="text-xs text-warm-gray/60 tabular-nums">
+            {phase + 1} of {PHASE_LABELS.length}
+          </p>
+        )}
       </div>
     </div>
   );
