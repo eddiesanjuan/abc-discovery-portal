@@ -105,9 +105,11 @@ export default function InterviewPage() {
     }
   }, [isLoading, messages, checkCompletion]);
 
-  // Estimate phase from completed exchanges (assistant messages only)
+  // Estimate phase from completed exchanges (assistant messages only).
+  // assistantMessageCount includes the initial greeting, so subtract 1 for phase index.
+  // There are 7 AI responses total (6 phase questions + 1 farewell), but only 6 phases
+  // in the progress bar. The farewell (response 7) keeps the bar at 6/6.
   const assistantMessageCount = messages.filter((m) => m.role === "assistant").length;
-  // Subtract 1 because the initial greeting is not a response to user input
   const phase = Math.min(Math.max(assistantMessageCount - 1, 0), PHASE_LABELS.length - 1);
 
   async function handleSend() {
