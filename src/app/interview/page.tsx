@@ -8,6 +8,7 @@ import { INITIAL_MESSAGE, PHASE_LABELS } from "@/lib/prompts";
 import ProgressBar from "@/components/interview/ProgressBar";
 import ChatContainer from "@/components/interview/ChatContainer";
 import InputBar from "@/components/interview/InputBar";
+import CompletionTransition from "@/components/interview/CompletionTransition";
 
 const emptySubscribe = () => () => {};
 
@@ -23,6 +24,7 @@ export default function InterviewPage() {
   const router = useRouter();
   const sessionId = useSessionId();
   const [completed, setCompleted] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const [input, setInput] = useState("");
 
   // Redirect if no session (client-only)
@@ -67,15 +69,29 @@ export default function InterviewPage() {
       .join("");
     if (text.includes("[INTERVIEW_COMPLETE]")) {
       setCompleted(true);
-      try {
-        await fetch("/api/extract", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        });
-      } catch {
+
+      // Brief pause so the user can read the final message before overlay
+      await new Promise((r) => setTimeout(r, 1500));
+
+      // Show the premium transition overlay
+      setTransitioning(true);
+
+      // Fire extraction in parallel with the visual transition
+      const extractionPromise = fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {
         // Extraction is best-effort
-      }
+      });
+
+      // Let the transition animation play for at least 2.5s
+      const [extractionDone] = await Promise.allSettled([
+        extractionPromise,
+        new Promise((r) => setTimeout(r, 2500)),
+      ]);
+      void extractionDone;
+
       router.push(`/complete?session=${sessionId}`);
     }
   }, [messages, sessionId, completed, router]);
@@ -113,12 +129,15 @@ export default function InterviewPage() {
     <div className="h-screen flex flex-col bg-ivory">
       <ProgressBar messageCount={messages.length} currentPhase={phase} />
       <ChatContainer messages={messages} status={status} />
-      <InputBar
-        input={input}
-        isLoading={isLoading}
-        onInputChange={setInput}
-        onSend={handleSend}
-      />
+      {!completed && (
+        <InputBar
+          input={input}
+          isLoading={isLoading}
+          onInputChange={setInput}
+          onSend={handleSend}
+        />
+      )}
+      {transitioning && <CompletionTransition />}
     </div>
   );
 }
