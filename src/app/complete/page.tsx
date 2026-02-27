@@ -60,17 +60,22 @@ function CompleteContent() {
   }
 
   return (
-    <div className="min-h-screen bg-ivory">
-      <Header />
-      <main className="px-6">
-        <ThankYouHero />
-        <SummaryCard
-          summary={session?.summary ?? null}
-          painPoints={safeParseArray(session?.key_pain_points ?? null)}
-          aiInterests={safeParseArray(session?.ai_interests ?? null)}
-        />
-        <NextSteps />
-      </main>
+    <div className="min-h-screen bg-ivory relative overflow-hidden">
+      {/* Warm radial gradient backdrop */}
+      <div className="absolute inset-0 bg-gradient-to-b from-cream/40 via-ivory to-ivory pointer-events-none" />
+
+      <div className="relative z-10">
+        <Header />
+        <main className="px-6">
+          <ThankYouHero />
+          <SummaryCard
+            summary={session?.summary ?? null}
+            painPoints={safeParseArray(session?.key_pain_points ?? null)}
+            aiInterests={safeParseArray(session?.ai_interests ?? null)}
+          />
+          <NextSteps />
+        </main>
+      </div>
     </div>
   );
 }

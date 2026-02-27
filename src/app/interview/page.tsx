@@ -5,7 +5,6 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useRouter } from "next/navigation";
 import { INITIAL_MESSAGE, PHASE_LABELS } from "@/lib/prompts";
-import InterviewHeader from "@/components/interview/InterviewHeader";
 import ProgressBar from "@/components/interview/ProgressBar";
 import ChatContainer from "@/components/interview/ChatContainer";
 import InputBar from "@/components/interview/InputBar";
@@ -112,12 +111,7 @@ export default function InterviewPage() {
 
   return (
     <div className="h-screen flex flex-col bg-ivory">
-      <ProgressBar messageCount={messages.length} />
-      <div className="border-b border-stone/20">
-        <div className="max-w-2xl mx-auto">
-          <InterviewHeader phase={phase} />
-        </div>
-      </div>
+      <ProgressBar messageCount={messages.length} currentPhase={phase} />
       <ChatContainer messages={messages} status={status} />
       <InputBar
         input={input}

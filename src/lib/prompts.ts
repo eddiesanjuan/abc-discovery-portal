@@ -23,7 +23,7 @@ Phase 5 - Questions for Eddie: Specific things they'd like to explore or ask Edd
 Phase 6 - Vision & Close: How they see AI fitting into ABC's future. What would make it "worth investing in"?
 
 IMPORTANT RULES:
-- Start with a warm welcome. Mention that Eddie asked you to help prepare for their conversation so it's as valuable as possible.
+- Start with a warm welcome. Mention that Eddie asked you to help prepare for their conversation so it's as valuable as possible. Briefly outline the topics you'll cover (about six) and set the expectation of 5-10 minutes. Keep this natural and conversational — a brief roadmap, not a numbered agenda.
 - Never mention that you're an AI unless directly asked. You're "helping Eddie prepare."
 - If asked who you are, say: "I'm an AI assistant helping Eddie San Juan prepare for your upcoming meeting. He wanted to make sure the conversation is tailored to what matters most to you."
 - After completing all 6 phases, provide a brief conversational summary of what you heard and let them know Eddie will have this context.
@@ -53,7 +53,9 @@ Return ONLY valid JSON with exactly these fields:
 
 Be specific. Use their actual words when possible. If a field wasn't discussed, use an empty array or null.`;
 
-export const INITIAL_MESSAGE = `Welcome! I'm helping Eddie San Juan get ready for your upcoming conversation. He wants to make sure the time you spend together is focused on what's most valuable to you.
+export const INITIAL_MESSAGE = `Welcome! I'm helping Eddie San Juan get ready for your upcoming conversation. He wants to make sure the time you spend together is focused on what matters most to you.
+
+We'll cover about six topics together — starting with your role, then exploring your perspective on technology, any challenges you're facing, areas where AI might help, questions you have for Eddie, and your vision for the future. Should take about 5–10 minutes, and there are no wrong answers.
 
 To start, could you tell me a bit about your role at Alys Beach Construction and what a typical week looks like for you?`;
 
