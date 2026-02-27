@@ -18,9 +18,13 @@ function getMessageText(msg: UIMessage): string {
 }
 
 function cleanAssistantText(text: string): string {
+  // Remove phase markers (e.g. [PHASE:3])
+  let cleaned = text.replace(/\[PHASE:\d+\]/g, "").trim();
+  // During streaming, hide partial phase marker artifacts (e.g. [PHASE, [PHASE:)
+  cleaned = cleaned.replace(/\[PHASE(?::\d*)?$/g, "").trim();
   // Remove complete marker
-  let cleaned = text.replace("[INTERVIEW_COMPLETE]", "").trim();
-  // During streaming, hide partial marker artifacts
+  cleaned = cleaned.replace("[INTERVIEW_COMPLETE]", "").trim();
+  // During streaming, hide partial interview-complete marker artifacts
   if (cleaned.includes("[INTERVIEW")) {
     cleaned = cleaned.replace(/\[INTERVIEW.*$/, "").trim();
   }

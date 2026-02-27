@@ -105,12 +105,25 @@ export default function InterviewPage() {
     }
   }, [isLoading, messages, checkCompletion]);
 
-  // Estimate phase from completed exchanges (assistant messages only).
-  // assistantMessageCount includes the initial greeting, so subtract 1 for phase index.
-  // There are 7 AI responses total (6 phase questions + 1 farewell), but only 6 phases
-  // in the progress bar. The farewell (response 7) keeps the bar at 6/6.
-  const assistantMessageCount = messages.filter((m) => m.role === "assistant").length;
-  const phase = Math.min(Math.max(assistantMessageCount - 1, 0), PHASE_LABELS.length - 1);
+  // Determine phase from the AI's [PHASE:N] marker in the most recent assistant message.
+  // Phase 7 (farewell) maps to phase index 5 (6/6 on the progress bar).
+  const phase = useMemo(() => {
+    const lastAssistant = [...messages]
+      .reverse()
+      .find((m) => m.role === "assistant");
+    if (!lastAssistant) return 0;
+    const text = lastAssistant.parts
+      .filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("");
+    const match = text.match(/\[PHASE:(\d+)\]/);
+    if (match) {
+      const n = parseInt(match[1], 10);
+      // Phase 7 (farewell) stays at 6/6 → index 5
+      return Math.min(Math.max(n - 1, 0), PHASE_LABELS.length - 1);
+    }
+    return 0;
+  }, [messages]);
 
   async function handleSend() {
     if (!input.trim() || isLoading) return;
@@ -129,7 +142,7 @@ export default function InterviewPage() {
 
   return (
     <div className="h-screen flex flex-col bg-ivory">
-      <ProgressBar messageCount={messages.length} currentPhase={phase} />
+      <ProgressBar currentPhase={phase} />
       <ChatContainer messages={messages} status={status} />
       {!completed && (
         <InputBar

@@ -3,20 +3,13 @@
 import { PHASE_LABELS } from "@/lib/prompts";
 
 interface ProgressBarProps {
-  messageCount: number;
-  currentPhase?: number;
+  currentPhase: number;
 }
 
 export default function ProgressBar({
-  messageCount,
   currentPhase,
 }: ProgressBarProps) {
-  // Use explicit phase if provided, otherwise estimate from message pairs
-  const pairCount = Math.floor(messageCount / 2);
-  const phase =
-    currentPhase !== undefined
-      ? currentPhase
-      : Math.min(pairCount, PHASE_LABELS.length - 1);
+  const phase = Math.min(currentPhase, PHASE_LABELS.length - 1);
   const progress = ((phase + 1) / PHASE_LABELS.length) * 100;
 
   return (
